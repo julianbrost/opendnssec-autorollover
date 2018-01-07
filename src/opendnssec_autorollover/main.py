@@ -22,6 +22,8 @@ class AutoRollover:
         self.register_handler('null', NullHandler())
         from opendnssec_autorollover.handlers.hosting_de import HostingDeHandler
         self.register_handler('hosting.de', HostingDeHandler())
+        from opendnssec_autorollover.handlers.gandi_net import GandiNetHandler
+        self.register_handler('gandi.net', GandiNetHandler())
 
     def get_handler(self, name):
         return self.handlers[name]

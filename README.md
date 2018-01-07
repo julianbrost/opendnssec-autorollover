@@ -42,4 +42,11 @@ Add a snippet like this to `config.ini`:
 
 ### Gandi.net
 
-TODO: soon...
+[Create an API key](https://v4.gandi.net/admin/api_key) in the old v4 control
+panel. The new control panel doesn't seem to support that feature. Also, as far
+as I know, there is no way to restrict this key to specific actions, so it has
+full access to your account. Then add a snippet like this to `config.ini`:
+
+    [example.org.]
+    handler = gandi.net
+    api_key = YOUR_API_KEY_HERE
