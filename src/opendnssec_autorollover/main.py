@@ -43,14 +43,9 @@ class AutoRollover:
 
     def handle_zone_ds(self, zone, changes):
         logging.debug('Looking up DS records for %s in its parent', zone)
-        union = set()
-        intersection = None
-        for ds_set in get_ds_sets(zone):
-            union |= ds_set
-            if intersection is None:
-                intersection = ds_set
-            else:
-                intersection &= ds_set
+        ds_sets = get_ds_sets(zone)
+        union = set.union(*ds_sets)
+        intersection = set.intersection(*ds_sets)
 
         logging.debug('DS present on some parent nameserver: %s', union)
         logging.debug('DS present on all parent nameservers: %s', intersection)
