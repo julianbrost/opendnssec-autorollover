@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from argparse import ArgumentParser
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -10,6 +11,7 @@ class AutoRollover:
     def __init__(self):
         self.handlers = dict()
         self.register_handlers()
+        self.parse_args()
         self.read_config()
 
     def register_handler(self, name, handler):
@@ -24,9 +26,14 @@ class AutoRollover:
     def get_handler(self, name):
         return self.handlers[name]
 
+    def parse_args(self):
+        parser = ArgumentParser(prog='opendnssec-autorollover', description='Automate parent zone updates with OpenDNSSEC')
+        parser.add_argument('--config', metavar='CONFIG', default='config.ini', help='path to the config file to load')
+        self.args = parser.parse_args()
+
     def read_config(self):
         self.config = ConfigParser()
-        self.config.read('config.ini')
+        self.config.read(self.args.config)
 
     def get_zone_config(self, zone):
         if self.config.has_section(zone):
