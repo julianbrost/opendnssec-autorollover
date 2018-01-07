@@ -1,2 +1,4 @@
 __pycache__/
 *.py[cod]
+[._]*.sw[a-p]
+/config.ini
