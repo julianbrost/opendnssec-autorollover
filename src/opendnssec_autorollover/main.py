@@ -24,15 +24,15 @@ class AutoRollover:
     def get_handler(self, name):
         return self.handlers[name]
 
+    def read_config(self):
+        self.config = ConfigParser()
+        self.config.read('config.ini')
+
     def get_zone_config(self, zone):
         if self.config.has_section(zone):
             return self.config[zone]
         else:
             return self.config['*']
-
-    def read_config(self):
-        self.config = ConfigParser()
-        self.config.read('config.ini')
 
     def handle_zone_dnskey(self, zone, changes):
         logging.debug('Handling zone %s', zone)
