@@ -40,11 +40,11 @@ class HostingDeHandler:
             flags, alg, pub = key
 
             if state == 'ready' and key not in current:
-                logging.debug('%s: add: %s', domain, key)
+                logging.debug('add: %s', key)
                 dnskey_add.append({'keyData': {'flags': flags, 'protocol': 3, 'algorithm': alg, 'publicKey': pub}})
 
             if state == 'retire' and key in current:
-                logging.debug('%s: remove: %s', domain, key)
+                logging.debug('remove: %s', key)
                 dnskey_remove.append({'keyData': {'flags': flags, 'protocol': 3, 'algorithm': alg, 'publicKey': pub}})
 
         return dnskey_add, dnskey_remove
