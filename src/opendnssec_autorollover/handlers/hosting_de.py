@@ -43,7 +43,7 @@ class HostingDeHandler(Handler):
         if req is None:
             req = dict()
         if not 'authToken' in req:
-            req = dict(req, authToken=self.config['auth_token'])
+            req = dict(req, authToken=self.config['api_key'])
         res = res_check(requests.post(url, json=req))
         assert res.status_code == 200
         res = res.json()
