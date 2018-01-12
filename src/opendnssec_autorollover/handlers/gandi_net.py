@@ -1,11 +1,11 @@
 import logging
 import xmlrpc.client
 
-from opendnssec_autorollover.handlers import HandlerBase
+from opendnssec_autorollover.handlers import Handler
 
 API_ENDPOINT = 'https://rpc.gandi.net/xmlrpc/'
 
-class GandiNetHandler(HandlerBase):
+class GandiNetHandler(Handler):
 
     def get_dnskeys(self, config, domain):
         with xmlrpc.client.ServerProxy(API_ENDPOINT) as api:

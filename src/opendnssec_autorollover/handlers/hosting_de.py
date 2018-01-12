@@ -1,7 +1,7 @@
 import logging
 import requests
 
-from opendnssec_autorollover.handlers import HandlerBase
+from opendnssec_autorollover.handlers import Handler
 
 API_BASE = 'https://secure.hosting.de/api'
 
@@ -28,7 +28,7 @@ def dnskey_from_api(key):
     pub = key['keyData']['publicKey']
     return (flags, alg, pub)
 
-class HostingDeHandler(HandlerBase):
+class HostingDeHandler(Handler):
 
     def __init__(self, zone, config):
         super(HostingDeHandler, self).__init__(zone, config)

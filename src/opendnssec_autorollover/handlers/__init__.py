@@ -1,6 +1,6 @@
 import logging
 
-class HandlerBase:
+class Handler:
     zone = None
     config = None
 
