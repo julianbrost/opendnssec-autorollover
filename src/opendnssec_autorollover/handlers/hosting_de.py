@@ -4,6 +4,8 @@ import time
 
 from opendnssec_autorollover.handlers import Handler
 
+logger = logging.getLogger(__name__)
+
 API_BASE = 'https://secure.hosting.de/api'
 
 API_DOMAIN_DNSSEC_KEYS_LIST = 'domain/v1/json/dnsSecKeysList'
@@ -50,15 +52,15 @@ class HostingDeHandler(Handler):
         assert res.status_code == 200
         res = res.json()
         for w in res.get('warnings', []):
-            logging.warning('hosting.de API: %s', w)
+            logger.warning('hosting.de API: %s', w)
         for e in res.get('errors', []):
-            logging.error('hosting.de API: %s', e)
+            logger.error('hosting.de API: %s', e)
         if sync_wait and res['status'] == 'pending':
             for t in range(1, sync_wait+1):
-                logging.debug('waiting %d second(s) for background job to complete', t)
+                logger.debug('waiting %d second(s) for background job to complete', t)
                 time.sleep(t)
                 state = self.get_job(res['metadata']['serverTransactionId'])['state']
-                logging.debug('job state: %s', state)
+                logger.debug('job state: %s', state)
                 if state == 'successful':
                     return res
             raise Exception('background job did not finish in time')
@@ -85,7 +87,7 @@ class HostingDeHandler(Handler):
 
     def update_dnskeys(self, add=None, remove=None):
         if not (add or remove):
-            logging.debug('%s: nothing to update, skipping', self.domain)
+            logger.debug('%s: nothing to update, skipping', self.domain)
             return
 
         req = {'domainName': self.domain}
@@ -101,18 +103,18 @@ class HostingDeHandler(Handler):
 
         for state, key in changes:
             if state == 'ready' and key not in current_dnskeys:
-                logging.debug('add: %s', key)
+                logger.debug('add: %s', key)
                 dnskey_add.append(key)
             if state == 'retire' and key in current_dnskeys:
-                logging.debug('remove: %s', key)
+                logger.debug('remove: %s', key)
                 dnskey_remove.append(key)
 
         return dnskey_add, dnskey_remove
 
     def run(self, changes):
         current_dnskeys = self.get_dnskeys()
-        logging.debug('%s: current: %s', self.domain, current_dnskeys)
+        logger.debug('%s: current: %s', self.domain, current_dnskeys)
         add, remove = self.make_key_delta(current_dnskeys, changes)
-        logging.debug('%s: add: %s', self.domain, add)
-        logging.debug('%s: remove: %s', self.domain, remove)
+        logger.debug('%s: add: %s', self.domain, add)
+        logger.debug('%s: remove: %s', self.domain, remove)
         self.update_dnskeys(add=add, remove=remove)

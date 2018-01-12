@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 from opendnssec_autorollover.opendnssec import get_pending_dnskey_changes, get_pending_ds_changes, notify_ds
 from opendnssec_autorollover.ds_lookup import get_ds_sets
@@ -50,30 +51,30 @@ class AutoRollover:
             return self.config['*']
 
     def handle_zone_dnskey(self, zone, changes):
-        logging.debug('Handling zone %s', zone)
+        logger.debug('Handling zone %s', zone)
         zone_config = self.get_zone_config(zone)
         handler = self.get_handler(zone_config['handler'])
-        logging.debug('Using handler %s', repr(handler))
+        logger.debug('Using handler %s', repr(handler))
         handler(zone, zone_config).run(changes)
 
     def handle_zone_ds(self, zone, changes):
-        logging.debug('Looking up DS records for %s in its parent', zone)
+        logger.debug('Looking up DS records for %s in its parent', zone)
         ds_sets = get_ds_sets(zone)
         union = set.union(*ds_sets)
         intersection = set.intersection(*ds_sets)
 
-        logging.debug('DS present on some parent nameserver: %s', union)
-        logging.debug('DS present on all parent nameservers: %s', intersection)
+        logger.debug('DS present on some parent nameserver: %s', union)
+        logger.debug('DS present on all parent nameservers: %s', intersection)
 
         for state, ds in changes:
             keytag, key_alg, hash_alg, hash_value = ds
 
             if state == 'ready' and ds in intersection:
-                logging.debug('Issuing ds-seen for %s/%d', zone, keytag)
+                logger.debug('Issuing ds-seen for %s/%d', zone, keytag)
                 notify_ds(zone, keytag, 'seen')
 
             if state == 'retire' and ds not in union:
-                logging.debug('Issuing ds-gone for %s/%d', zone, keytag)
+                logger.debug('Issuing ds-gone for %s/%d', zone, keytag)
                 notify_ds(zone, keytag, 'gone')
 
     def run(self):
