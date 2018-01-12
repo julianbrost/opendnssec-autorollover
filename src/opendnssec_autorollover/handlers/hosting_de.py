@@ -1,5 +1,6 @@
 import logging
 import requests
+import time
 
 from opendnssec_autorollover.handlers import Handler
 
@@ -7,6 +8,7 @@ API_BASE = 'https://secure.hosting.de/api'
 
 API_DOMAIN_DNSSEC_KEYS_LIST = 'domain/v1/json/dnsSecKeysList'
 API_DOMAIN_DNSSEC_KEYS_MODIFY = 'domain/v1/json/dnsSecKeyModify'
+API_DOMAIN_JOBS_FIND = 'domain/v1/json/jobsFind'
 
 def res_check(res):
     return res
@@ -38,7 +40,7 @@ class HostingDeHandler(Handler):
     def api_base(self):
         return self.config.get('api_base', API_BASE)
 
-    def api_request(self, method, req=None):
+    def api_request(self, method, req=None, sync_wait=10):
         url = '{}/{}'.format(self.api_base, method)
         if req is None:
             req = dict()
@@ -51,6 +53,15 @@ class HostingDeHandler(Handler):
             logging.warning('hosting.de API: %s', w)
         for e in res.get('errors', []):
             logging.error('hosting.de API: %s', e)
+        if sync_wait and res['status'] == 'pending':
+            for t in range(1, sync_wait+1):
+                logging.debug('waiting %d second(s) for background job to complete', t)
+                time.sleep(t)
+                state = self.get_job(res['metadata']['serverTransactionId'])['state']
+                logging.debug('job state: %s', state)
+                if state == 'successful':
+                    return res
+            raise Exception('background job did not finish in time')
         if res['status'] not in ['success', 'pending']:
             raise Exception('hosting.de API returned status "{}"'.format(res['status']), res)
         return res
@@ -59,6 +70,18 @@ class HostingDeHandler(Handler):
         req = {'domainName': self.domain}
         res = self.api_request(API_DOMAIN_DNSSEC_KEYS_LIST, req)
         return set(dnskey_from_api(k) for k in res['responses'])
+
+    def get_job(self, server_transaction_id):
+        req = {
+            'filter': {
+                'field': 'JobServerTransactionId',
+                'value': server_transaction_id,
+            }
+        }
+        res = self.api_request(API_DOMAIN_JOBS_FIND, req, sync_wait=False)
+        assert res['response']['totalEntries'] == 1
+        assert len(res['response']['data']) == 1
+        return res['response']['data'][0]
 
     def update_dnskeys(self, add=None, remove=None):
         if not (add or remove):
