@@ -1,5 +1,7 @@
 import logging
 
-class NullHandler:
-    def handle(self, zone, config, changes):
-        logging.debug('ignoring changes for zone %s', zone)
+from opendnssec_autorollover.handlers import HandlerBase
+
+class NullHandler(HandlerBase):
+    def run(self, changes):
+        logging.debug('ignoring changes for zone %s', self.zone)

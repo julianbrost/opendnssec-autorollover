@@ -4,7 +4,7 @@ import requests
 API_DOMAIN_INFO = 'https://secure.hosting.de/api/domain/v1/json/domainInfo'
 API_DOMAIN_UPDATE = 'https://secure.hosting.de/api/domain/v1/json/domainUpdate'
 
-class HostingDeHandler:
+class HostingDeHandler(HandlerBase):
 
     def res_check(self, res):
         assert res.status_code == 200
@@ -75,3 +75,7 @@ class HostingDeHandler:
         current_dnskeys = domain_obj['dnsSecEntries']
         dnskey_add, dnskey_remove = self.make_key_delta(current_dnskeys, changes)
         self.update_domain(config, domain_obj, dnskey_add, dnskey_remove)
+
+    # TODO: remove
+    def run(self, changes):
+        self.handle(self.zone, self.config, changes)

@@ -19,11 +19,17 @@ class AutoRollover:
 
     def register_handlers(self):
         from opendnssec_autorollover.handlers.null import NullHandler
-        self.register_handler('null', NullHandler())
+        self.register_handler('null', NullHandler)
         from opendnssec_autorollover.handlers.hosting_de import HostingDeHandler
-        self.register_handler('hosting.de', HostingDeHandler())
+        self.register_handler('hosting.de', HostingDeHandler)
         from opendnssec_autorollover.handlers.gandi_net import GandiNetHandler
-        self.register_handler('gandi.net', GandiNetHandler())
+        self.register_handler('gandi.net', GandiNetHandler)
+
+    def call_handler_hooks(self, name):
+        method = '{}_hook'.format(name)
+        for handler in self.handlers.values():
+            hook = getattr(handler, method)
+            hook()
 
     def get_handler(self, name):
         return self.handlers[name]
@@ -48,7 +54,7 @@ class AutoRollover:
         zone_config = self.get_zone_config(zone)
         handler = self.get_handler(zone_config['handler'])
         logging.debug('Using handler %s', repr(handler))
-        handler.handle(zone, zone_config, changes)
+        handler(zone, zone_config).run(changes)
 
     def handle_zone_ds(self, zone, changes):
         logging.debug('Looking up DS records for %s in its parent', zone)
@@ -72,8 +78,10 @@ class AutoRollover:
 
     def run(self):
         # push out changed DNSKEYs
+        self.call_handler_hooks('pre')
         for zone, changes in get_pending_dnskey_changes().items():
             self.handle_zone_dnskey(zone, changes)
+        self.call_handler_hooks('pre')
 
         # update OpenDNSSEC internal state using ds-seen and ds-gone
         for zone, changes in get_pending_ds_changes().items():

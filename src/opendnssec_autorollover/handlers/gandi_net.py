@@ -1,9 +1,11 @@
 import logging
 import xmlrpc.client
 
+from opendnssec_autorollover.handlers import HandlerBase
+
 API_ENDPOINT = 'https://rpc.gandi.net/xmlrpc/'
 
-class GandiNetHandler:
+class GandiNetHandler(HandlerBase):
 
     def get_dnskeys(self, config, domain):
         with xmlrpc.client.ServerProxy(API_ENDPOINT) as api:
@@ -49,3 +51,7 @@ class GandiNetHandler:
         current_dnskeys = self.get_dnskeys(config, domain)
         dnskey_add, dnskey_remove = self.make_key_delta(current_dnskeys, changes)
         self.update_dnskeys(config, domain, dnskey_add, dnskey_remove)
+
+    # TODO: remove
+    def run(self, changes):
+        self.handle(self.zone, self.config, changes)
