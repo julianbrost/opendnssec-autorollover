@@ -38,7 +38,7 @@ Add a snippet like this to `config.ini`:
 
     [example.com.]
     handler = hosting.de
-    auth_token = YOUR_API_KEY_HERE
+    api_key = YOUR_API_KEY_HERE
 
 ### Gandi.net
 
