@@ -18,3 +18,12 @@ class Handler:
 
     def run(self, changes):
         raise NotImplementedError
+
+all_handlers = dict()
+
+def register_handler(name):
+    def decorator(cls):
+        assert name not in all_handlers
+        all_handlers[name] = cls
+        return cls
+    return decorator

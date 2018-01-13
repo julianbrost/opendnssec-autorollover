@@ -2,7 +2,7 @@ import logging
 import requests
 import time
 
-from opendnssec_autorollover.handlers import Handler
+from opendnssec_autorollover.handlers import Handler, register_handler
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ def dnskey_from_api(key):
     pub = key['keyData']['publicKey']
     return (flags, alg, pub)
 
+@register_handler('hosting.de')
 class HostingDeHandler(Handler):
 
     @property

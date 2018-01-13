@@ -19,12 +19,16 @@ class AutoRollover:
         self.handlers[name] = handler
 
     def register_handlers(self):
-        from opendnssec_autorollover.handlers.null import NullHandler
-        self.register_handler('null', NullHandler)
-        from opendnssec_autorollover.handlers.hosting_de import HostingDeHandler
-        self.register_handler('hosting.de', HostingDeHandler)
-        from opendnssec_autorollover.handlers.gandi_net import GandiNetHandler
-        self.register_handler('gandi.net', GandiNetHandler)
+        # TODO: build some import magic for this?
+        import opendnssec_autorollover.handlers.null
+        import opendnssec_autorollover.handlers.hosting_de
+        import opendnssec_autorollover.handlers.gandi_net
+
+        # The above imports all use a @register_handler decorator which adds
+        # the handlers to the following all_handlers dict.
+        from opendnssec_autorollover.handlers import all_handlers
+        for name, handler in all_handlers.items():
+            self.register_handler(name, handler)
 
     def call_handler_hooks(self, name):
         method = '{}_hook'.format(name)
