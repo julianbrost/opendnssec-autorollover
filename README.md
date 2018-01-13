@@ -30,9 +30,9 @@ with ods-enforcer. To get started, just do the following:
 [Create an API key](https://secure.hosting.de/profile/api-keys/create) in their control panel
 with at least these permissions:
 
- * `DOM_DOMAINS_EDIT`
  * `DOM_DOMAINS_EDIT_DNSSEC_DATA`
  * `DOM_DOMAINS_LIST`
+ * `DOM_JOBS_LIST`
 
 Add a snippet like this to `config.ini`:
 
