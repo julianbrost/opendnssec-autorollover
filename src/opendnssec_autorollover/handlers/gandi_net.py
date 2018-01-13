@@ -49,10 +49,9 @@ class GandiNetHandler(Handler):
                 api.domain.dnssec.delete(config['api_key'], key)
 
     def handle(self, zone, config, changes):
-        domain = zone.rstrip('.')
-        current_dnskeys = self.get_dnskeys(config, domain)
+        current_dnskeys = self.get_dnskeys(config, zone)
         dnskey_add, dnskey_remove = self.make_key_delta(current_dnskeys, changes)
-        self.update_dnskeys(config, domain, dnskey_add, dnskey_remove)
+        self.update_dnskeys(config, zone, dnskey_add, dnskey_remove)
 
     # TODO: remove
     def run(self, changes):

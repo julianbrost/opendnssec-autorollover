@@ -34,10 +34,6 @@ def dnskey_from_api(key):
 
 class HostingDeHandler(Handler):
 
-    def __init__(self, zone, config):
-        super(HostingDeHandler, self).__init__(zone, config)
-        self.domain = zone.rstrip('.')
-
     @property
     def api_base(self):
         return self.config.get('api_base', API_BASE)
@@ -69,7 +65,7 @@ class HostingDeHandler(Handler):
         return res
 
     def get_dnskeys(self):
-        req = {'domainName': self.domain}
+        req = {'domainName': self.zone}
         res = self.api_request(API_DOMAIN_DNSSEC_KEYS_LIST, req)
         return set(dnskey_from_api(k) for k in res['responses'])
 
@@ -87,10 +83,10 @@ class HostingDeHandler(Handler):
 
     def update_dnskeys(self, add=None, remove=None):
         if not (add or remove):
-            logger.debug('%s: nothing to update, skipping', self.domain)
+            logger.debug('%s: nothing to update, skipping', self.zone)
             return
 
-        req = {'domainName': self.domain}
+        req = {'domainName': self.zone}
         if add:
             req['add'] = [dnskey_to_api(k) for k in add]
         if remove:
@@ -113,8 +109,8 @@ class HostingDeHandler(Handler):
 
     def run(self, changes):
         current_dnskeys = self.get_dnskeys()
-        logger.debug('%s: current: %s', self.domain, current_dnskeys)
+        logger.debug('%s: current: %s', self.zone, current_dnskeys)
         add, remove = self.make_key_delta(current_dnskeys, changes)
-        logger.debug('%s: add: %s', self.domain, add)
-        logger.debug('%s: remove: %s', self.domain, remove)
+        logger.debug('%s: add: %s', self.zone, add)
+        logger.debug('%s: remove: %s', self.zone, remove)
         self.update_dnskeys(add=add, remove=remove)
