@@ -36,7 +36,7 @@ with at least these permissions:
 
 Add a snippet like this to `config.ini`:
 
-    [example.com.]
+    [example.com]
     handler = hosting.de
     api_key = YOUR_API_KEY_HERE
 
@@ -47,6 +47,6 @@ panel. The new control panel doesn't seem to support that feature. Also, as far
 as I know, there is no way to restrict this key to specific actions, so it has
 full access to your account. Then add a snippet like this to `config.ini`:
 
-    [example.org.]
+    [example.org]
     handler = gandi.net
     api_key = YOUR_API_KEY_HERE
