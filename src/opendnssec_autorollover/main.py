@@ -82,7 +82,7 @@ class AutoRollover:
         self.call_handler_hooks('pre')
         for zone, changes in get_pending_dnskey_changes().items():
             self.handle_zone_dnskey(zone, changes)
-        self.call_handler_hooks('pre')
+        self.call_handler_hooks('post')
 
         # update OpenDNSSEC internal state using ds-seen and ds-gone
         for zone, changes in get_pending_ds_changes().items():
