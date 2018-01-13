@@ -23,6 +23,7 @@ class AutoRollover:
         import opendnssec_autorollover.handlers.null
         import opendnssec_autorollover.handlers.hosting_de
         import opendnssec_autorollover.handlers.gandi_net
+        import opendnssec_autorollover.handlers.email
 
         # The above imports all use a @register_handler decorator which adds
         # the handlers to the following all_handlers dict.
