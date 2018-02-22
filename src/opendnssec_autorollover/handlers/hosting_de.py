@@ -12,9 +12,6 @@ API_DOMAIN_DNSSEC_KEYS_LIST = 'domain/v1/json/dnsSecKeysList'
 API_DOMAIN_DNSSEC_KEYS_MODIFY = 'domain/v1/json/dnsSecKeyModify'
 API_DOMAIN_JOBS_FIND = 'domain/v1/json/jobsFind'
 
-def res_check(res):
-    return res
-
 def dnskey_to_api(key):
     flags, alg, pub = key
     return {
@@ -45,7 +42,7 @@ class HostingDeHandler(Handler):
             req = dict()
         if not 'authToken' in req:
             req = dict(req, authToken=self.config['api_key'])
-        res = res_check(requests.post(url, json=req))
+        res = requests.post(url, json=req)
         assert res.status_code == 200
         res = res.json()
         for w in res.get('warnings', []):
